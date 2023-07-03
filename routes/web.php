@@ -20,3 +20,12 @@ Route::get('/', function () {
 Route::get('/login', function () {
     return "login page";
 });
+
+Route::get('/register', function () {
+    return "register page";
+});
+
+
+Route::get('/register2', function () {
+    return "register page 2";
+});
