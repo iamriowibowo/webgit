@@ -35,23 +35,25 @@ Route::get('/git/branches', function () {
     $arrayBranches = explode("\n  ", str_replace('\n', "\n", $branches[0]));
 
     // Print the list of branches
-    return $arrayBranches;
+    // return $arrayBranches;
+    dd($arrayBranches);
 });
 
 Route::get('/git/branches/checkout', function () {
-    $coBr = 'feature/login';
+    $branch = 'feature/login';
 
     // Create a new process to execute the git checkout command
-    $checkoutProcess = new Process(['C:\laragon\bin\git\bin\git.exe', 'checkout', $coBr]);
+    $checkoutProcess = new Process(['C:\laragon\bin\git\bin\git.exe', 'checkout', $branch]);
 
     // Run the checkout process
     $checkoutProcess->run();
 
     // Check if the checkout was successful
     if ($checkoutProcess->isSuccessful()) {
-        echo 'Branch checked out successfully.';
+        echo 'Branch '.$branch.' checked out successfully.';
     } else {
         echo 'Failed to checkout branch.';
+        echo 'Error Output: ' . $checkoutProcess->getErrorOutput();
     }
 
     // Create a new process to execute the git branch command
@@ -70,5 +72,5 @@ Route::get('/git/branches/checkout', function () {
     $arrayBranches = explode("\n  ", str_replace("\n", "\n", $branches[0]));
 
     // Print the list of branches
-    return $arrayBranches;
+    dd($arrayBranches);
 });
