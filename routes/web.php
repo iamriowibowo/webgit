@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\Process\Process;
+use App\Http\Controllers\GitController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,59 +19,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/git/branches', function () {
-    // Create a new process to execute the git branch command
-    $process = new Process(['C:\laragon\bin\git\bin\git.exe', 'branch']);
+Route::get('/projects', [GitController::class, 'project']);
 
-    // Run the process and capture the output
-    $process->run();
+Route::get('/projects/{project}/', [GitController::class, 'projectBranch']);
 
-    // Get the output as a string
-    $output = $process->getOutput();
-
-    // Process the output to extract the branch names
-    $branches = explode(PHP_EOL, trim($output));
-
-    // Variable to store branch name
-    $arrayBranches = explode("\n  ", str_replace('\n', "\n", $branches[0]));
-
-    // Print the list of branches
-    // return $arrayBranches;
-    dd($arrayBranches);
-});
-
-Route::get('/git/branches/checkout', function () {
-    $branch = 'feature/login';
-
-    // Create a new process to execute the git checkout command
-    $checkoutProcess = new Process(['C:\laragon\bin\git\bin\git.exe', 'checkout', $branch]);
-
-    // Run the checkout process
-    $checkoutProcess->run();
-
-    // Check if the checkout was successful
-    if ($checkoutProcess->isSuccessful()) {
-        echo 'Branch '.$branch.' checked out successfully.';
-    } else {
-        echo 'Failed to checkout branch.';
-        echo 'Error Output: ' . $checkoutProcess->getErrorOutput();
-    }
-
-    // Create a new process to execute the git branch command
-    $process = new Process(['C:\laragon\bin\git\bin\git.exe', 'branch']);
-
-    // Run the process and capture the output
-    $process->run();
-
-    // Get the output as a string
-    $output = $process->getOutput();
-
-    // Process the output to extract the branch names
-    $branches = explode(PHP_EOL, trim($output));
-
-    // Variable to store branch name
-    $arrayBranches = explode("\n  ", str_replace("\n", "\n", $branches[0]));
-
-    // Print the list of branches
-    dd($arrayBranches);
-});
+Route::get('/projects/{project}/checkout', [GitController::class, 'projectBranchCheckout']);
