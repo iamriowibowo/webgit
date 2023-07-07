@@ -5,15 +5,29 @@ Webgit is a web based GUI tool to help software company to test feature by switc
 Webgit is accessible, powerful, and provides tools required for large, robust applications.
 
 ## Installation
-Once you've cloned the repo, run command `php artisan key:generate` and after that you only need to edit `.env` file by adding these two lines.
+Once you've cloned the repo, run command these commands 
+```
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Set up your database in `.env` file and then run
+
+```
+php artisan migrate
+```
+
+and after that you only need to edit `.env` file by adding these two lines.
 
 ```
 GIT_EXEC=C:\laragon\bin\git\bin\git.exe
 GIT_PULL=false
 ```
 
-GIT_EXEC is the path to the git executable.
-GIT_PULL is a boolean value, this variable is used to determine wether you want to git pull after git checkout.
+`GIT_EXEC` is the path to the git executable.
+
+`GIT_PULL` is a boolean value, this variable is used to determine wether you want to git pull after git checkout.
 
 To get the path to the Git executable on your system, you can use the which command in the terminal. Here's how you can do it:
 
