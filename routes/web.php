@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use Symfony\Component\Process\Process;
 use App\Http\Controllers\GitController;
 
 /*
@@ -19,8 +19,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/projects', [GitController::class, 'project']);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/projects/{project}/', [GitController::class, 'projectBranch']);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Git project routes
+    Route::get('/projects', [GitController::class, 'project'])->name('project.index');
+    Route::get('/projects/{project}/', [GitController::class, 'projectBranch'])->name('project.show');
+    Route::get('/projects/{project}/checkout', [GitController::class, 'projectBranchCheckout'])->name('project.checkout');
+});
 
-Route::get('/projects/{project}/checkout', [GitController::class, 'projectBranchCheckout']);
+require __DIR__.'/auth.php';

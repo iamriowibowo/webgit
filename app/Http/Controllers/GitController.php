@@ -14,7 +14,9 @@ class GitController extends Controller
      */
     public function project()
     {
-        return GitServices::projects();
+        $projects = GitServices::projects();
+
+        return view('projects.index', compact('projects'));
     }
 
     /**
