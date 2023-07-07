@@ -10,6 +10,8 @@ Once you've cloned the repo, run command these commands
 composer install
 cp .env.example .env
 php artisan key:generate
+npm install
+npm run dev
 ```
 
 Set up your database in `.env` file and then run
