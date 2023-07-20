@@ -20,18 +20,7 @@ Set up your database in `.env` file and then run
 php artisan migrate
 ```
 
-and after that you only need to edit `.env` file by adding these two lines.
-
-```
-GIT_EXEC=C:\laragon\bin\git\bin\git.exe
-GIT_PULL=false
-```
-
-`GIT_EXEC` is the path to the git executable.
-
-`GIT_PULL` is a boolean value, this variable is used to determine wether you want to git pull after git checkout.
-
-To get the path to the Git executable on your system, you can use the which command in the terminal. Here's how you can do it:
+You need to get the path to the Git executable on your system, you can use the which command in the terminal. Here's how you can do it:
 
 1. Open a terminal or command prompt.
 
@@ -57,3 +46,14 @@ C:\laragon\bin\git\bin\git.exe
 This path can be used in your PHP code or Laravel application when executing Git commands using the Process component or other methods.
 
 Note that the exact path may vary depending on your system and how Git is installed.
+
+Now you only need to edit `.env` file by adding these two lines.
+
+```
+GIT_EXEC=[YOUR_GIT_PATH_HERE]
+GIT_PULL=false
+```
+
+`GIT_EXEC` is the path to the git executable.
+
+`GIT_PULL` is a boolean value, this variable is used to determine wether you want to git pull after git checkout.
