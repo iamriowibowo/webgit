@@ -4,7 +4,8 @@ namespace App\Services;
 
 use Symfony\Component\Process\Process;
 
-class GitServices {
+class GitServices
+{
 
     public static function gitExec()
     {
@@ -16,18 +17,18 @@ class GitServices {
     public static function projects()
     {
         // Specify the directory path
-        $directory = '../../'; 
-        
+        $directory = '../../';
+
         // Get all directories
         $directories = glob($directory . '*', GLOB_ONLYDIR);
-        
+
         // Store directory in array
         $arrayDirectory =  [];
 
         foreach ($directories as $dir) {
             // Get the directory name from the full path
             $dirName = basename($dir);
-        
+
             // Push to directory
             array_push($arrayDirectory, $dirName);
         }
@@ -39,8 +40,8 @@ class GitServices {
     public static function projectBranches($request)
     {
         $project = $request->project;
-        
-        if(!$project){
+
+        if (!$project) {
             return response()->json([
                 'message' => 'Choose project first',
             ], 400);
@@ -49,18 +50,18 @@ class GitServices {
         // Check if project exist
         $projectExist = in_array($project, self::projects());
 
-        if(!$projectExist){
+        if (!$projectExist) {
             return response()->json([
                 'message' => 'Project does not exist',
             ], 404);
         }
 
-        // Path to the repository of project B
-        $repositoryPath = '../../'.$project;
+        // Path to the repository of project
+        $repositoryPath = '../../' . $project;
 
         // Git executable
         $gitExecutable = self::gitExec();
-        
+
         // Git process
         $process = new Process([$gitExecutable, '--git-dir=' . $repositoryPath . '/.git', '--work-tree=' . $repositoryPath, 'branch']);
 
@@ -84,85 +85,88 @@ class GitServices {
         }
 
         return $arrayBranches;
-    } 
-    
+    }
+
     public static function projectBranchCheckout($request)
     {
         $project = $request->project;
-        $branch = $request->branch;
-
-        // Check if branch active
-        $branchActive = in_array('* '.$branch, self::projectBranches($request));
-
-        if($branchActive){
-            return response()->json([
-                'message' => 'Branch '.$branch.' is currently active.',
-            ], 404);
-        }
+        $selectedBranch = $request->branch; // Full branch name included astersik (*) sign        
+        $branch = explode(' ', $selectedBranch)[1] ?? $selectedBranch; // Get branch name only without asterisk * sign on active branch
 
         // Check if branch exist
-        $branchExist = in_array($branch, self::projectBranches($request));
-
-        if(!$branchExist){
+        $branchExist = in_array($selectedBranch, self::projectBranches($request));
+        if (!$branchExist) {
             return response()->json([
-                'message' => 'Branch does not exist',
+                'message' => 'Branch '.$branch.' does not exist',
             ], 404);
         }
 
         // Git executable
         $gitExecutable = self::gitExec();
 
-        // Path to the repository of project B
-        $repositoryPath = '../../'.$project;
+        // Path to the repository of project
+        $repositoryPath = '../../' . $project;
 
         // Create a new process to execute the git checkout command
         $processGitCheckout = new Process([
-            $gitExecutable, 
-            '--git-dir=' . $repositoryPath . '/.git', 
-            '--work-tree=' . $repositoryPath, 
-            'checkout', 
+            $gitExecutable,
+            '--git-dir=' . $repositoryPath . '/.git',
+            '--work-tree=' . $repositoryPath,
+            'checkout',
             $branch
         ]);
-    
-        // Run the checkout process
+
+        // Run git checkout process
         $processGitCheckout->run();
 
         // When git checkout failed, return error message
         if (!$processGitCheckout->isSuccessful()) {
             return response()->json([
-                'message' => 'Failed to checkout branch '.$branch,
+                'message' => 'Failed to checkout branch ' . $branch,
                 'error' => $processGitCheckout->getErrorOutput()
             ], 500);
         }
+
+        // Run git pull process
+        if (env('GIT_PULL')) {
+            $gitPull = self::projectBranchPull($project, $branch);
         
-        if(env('GIT_PULL')){
-            // Create a new process to execute the git checkout command
-            $processGitPull = new Process([
-                $gitExecutable, 
-                '--git-dir=' . $repositoryPath . '/.git', 
-                '--work-tree=' . $repositoryPath, 
-                'pull'
-            ]);        
-    
-            // Run the pull process
-            $processGitPull->run();
-    
-            // When git pull failed, return error message
-            if (!$processGitPull->isSuccessful()) {
-                return response()->json([
-                    'message' => 'Failed to pull branch '.$branch,
-                    'error' => $processGitPull->getErrorOutput()
-                ], 500);
-            }
-
             return response()->json([
-                'message' => 'Branch '.$branch.' checked out and pulled successfully',
-            ]);
+                'message' => $gitPull->original['message'],
+                'error' => $gitPull->original['error'] ?? ''
+            ], 200);
+        }
+    }
 
+    public static function projectBranchPull($project, $branch)
+    {
+        // Git executable
+        $gitExecutable = self::gitExec();
+
+        // Path to the repository of project
+        $repositoryPath = '../../' . $project;
+
+        // Create a new process to execute the git checkout command
+        $processGitPull = new Process([
+            $gitExecutable,
+            '--git-dir=' . $repositoryPath . '/.git',
+            '--work-tree=' . $repositoryPath,
+            'pull'
+        ]);
+
+        // Run the pull process
+        $processGitPull->run();
+
+        // When git pull failed, return error message
+        if (!$processGitPull->isSuccessful()) {
+            return response()->json([
+                'message' => 'Failed to pull branch ' . $branch,
+                'error' => $processGitPull->getErrorOutput()
+            ], 400);
         }
 
         return response()->json([
-            'message' => 'Branch '.$branch.' checked out successfully',
-        ]);
-    }    
+            'message' => 'Branch ' . $branch . ' checked out and pulled successfully',
+        ], 200);
+    }
 }

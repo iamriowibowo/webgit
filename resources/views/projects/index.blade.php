@@ -18,12 +18,15 @@
                         </select>
                         <select name="" id="branch-name">
                         </select>
-                        <button class="btn-checkout bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" disabled>checkout</button>
+                        <button class="btn-checkout bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" disabled>pull</button>
                     </div>
                 </div>
                 <div class="p-6 text-gray-900">
                     <span class="loader">Processing...</span>
-                    <div class="checkout-status"></div>
+                    <div class="checkout-status">
+                        <span class="message"></span> <br>
+                        <span class="error text-red-600"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,14 +36,14 @@
     @push('scripts')
         <script>
             $(".loader").hide();
-            $(".checkout-status").hide();
+            // $(".checkout-status").hide();
 
             $('#project-name').change(function(){
-                var projectName = $(this).val();
-                
-                // Remove all options and set checkout button disabled when project name is not selected
+                var projectName = $(this).val();                
+                $("#branch-name").empty();
+
+                // Set checkout button disabled when project name is not selected
                 if (!projectName) {
-                    $("#branch-name").empty();
                     $(".btn-checkout").attr("disabled", "disabled");
                     return;
                 }
@@ -70,12 +73,14 @@
 
                 // Hide previous checkout status
                 $(".checkout-status").hide();
+                $(".checkout-status .error").text('');
 
                 // Checkout project to selected branch
                 $.get('projects/' + projectName + '/checkout?branch=' + branchName, function (data) {
 
                     // Show checkout status
-                    $(".checkout-status").text(data.message);
+                    $(".checkout-status .message").text(data.message);
+                    $(".checkout-status .error").text(data.error);
 
                     // Hide loader
                     $(".loader").hide();
