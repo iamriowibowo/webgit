@@ -47,13 +47,13 @@ This path can be used in your PHP code or Laravel application when executing Git
 
 Note that the exact path may vary depending on your system and how Git is installed.
 
-Now you only need to edit `.env` file by adding these two lines.
+Now you only need to edit git path in `.env` file.
 
 ```
 GIT_EXEC=[YOUR_GIT_PATH_HERE]
-GIT_PULL=false
+GIT_PULL=true
 ```
 
 `GIT_EXEC` is the path to the git executable.
 
-`GIT_PULL` is a boolean value, this variable is used to determine wether you want to git pull after git checkout.
+`GIT_PULL` is a boolean value, this variable is used to determine wether you want to git pull after git checkout. Default value is true.
