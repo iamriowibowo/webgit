@@ -10,7 +10,6 @@ Once you've cloned the repo, run command these commands
 composer install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate --seed
 npm install
 npm run build
 ```
@@ -18,7 +17,7 @@ npm run build
 Set up your database in `.env` file and then run
 
 ```
-php artisan migrate
+php artisan migrate --seed
 ```
 
 You need to get the path to the Git executable on your system, you can use the which command in the terminal. Here's how you can do it:
