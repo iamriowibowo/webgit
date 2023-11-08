@@ -7,6 +7,9 @@ use Symfony\Component\Process\Process;
 class GitServices
 {
 
+    /** 
+     * Function to execute git command
+    */
     public static function gitExec()
     {
         $gitExecutable = env('GIT_EXEC');
@@ -14,6 +17,9 @@ class GitServices
         return $gitExecutable;
     }
 
+    /**
+     * Get listing of projects
+     */
     public static function projects()
     {
         // Specify the directory path
@@ -37,6 +43,9 @@ class GitServices
         return array_diff($arrayDirectory, array('webgit'));
     }
 
+    /**
+     * Get project branches if available
+     */
     public static function projectBranches($request)
     {
         $project = $request->project;
@@ -87,6 +96,9 @@ class GitServices
         return $arrayBranches;
     }
 
+    /**
+     * Run branch checkout to selected branch
+     */
     public static function projectBranchCheckout($request)
     {
         $project = $request->project;
@@ -138,6 +150,9 @@ class GitServices
         }
     }
 
+    /**
+     * Run git pull from selected branch
+     */
     public static function projectBranchPull($project, $branch)
     {
         // Git executable
@@ -160,7 +175,7 @@ class GitServices
         // When git pull failed, return error message
         if (!$processGitPull->isSuccessful()) {
             return response()->json([
-                'message' => 'Failed to pull branch ' . $branch,
+                'message' => 'Branch ' . $branch . ' checked out successfully but failed to pull from remote origin.',
                 'error' => $processGitPull->getErrorOutput()
             ], 400);
         }
